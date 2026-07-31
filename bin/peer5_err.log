@@ -1,0 +1,1 @@
+2026/07/30 18:31:56 Peer-5: failed to register with bootstrap: rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp 127.0.0.1:5000: connectex: No connection could be made because the target machine actively refused it."

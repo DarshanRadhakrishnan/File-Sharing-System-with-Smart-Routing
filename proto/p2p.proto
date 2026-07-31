@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package p2p;
+
+option go_package = "github.com/darshan/p2p-fileshare/proto";
+
+// ============================================================
+// BOOTSTRAP SERVICE
+// Central registry for peer discovery
+// ============================================================
+
+service BootstrapService {
+  // Register a new peer and receive a list of known peers
+  rpc RegisterPeer(RegisterRequest) returns (RegisterResponse);
+  // Get a list of active peers
+  rpc GetPeers(GetPeersRequest) returns (GetPeersResponse);
+}
+
+// ============================================================
+// PEER SERVICE
+// Peer-to-peer communication
+// ============================================================
+
+service PeerService {
+  // Ping for latency measurement
+  rpc Ping(PingRequest) returns (PingResponse);
+  // Get the peer's view of the network graph
+  rpc GetNetworkGraph(GraphRequest) returns (GraphResponse);
+  // Notify peer about a new peer joining the network
+  rpc NotifyNewPeer(NewPeerNotification) returns (NotifyResponse);
+}
+
+// ============================================================
+// COMMON MESSAGES
+// ============================================================
+
+// Information about a peer in the network
+message PeerInfo {
+  int32 peer_id = 1;
+  string address = 2;
+  int64 last_seen = 3; // Unix timestamp
+}
+
+// ============================================================
+// BOOTSTRAP MESSAGES
+// ============================================================
+
+// Request to register a peer with the bootstrap server
+message RegisterRequest {
+  int32 peer_id = 1;
+  string address = 2;
+}
+
+// Response from bootstrap after registration
+message RegisterResponse {
+  bool success = 1;
+  repeated PeerInfo peers = 2; // List of known peers to connect to
+}
+
+// Request to get list of active peers
+message GetPeersRequest {
+  int32 limit = 1; // Max number of peers to return
+}
+
+// Response with list of active peers
+message GetPeersResponse {
+  repeated PeerInfo peers = 1;
+}
+
+// ============================================================
+// PEER MESSAGES
+// ============================================================
+
+// Ping request for latency measurement
+message PingRequest {
+  int32 sender_id = 1;
+  int64 timestamp = 2; // Unix nano timestamp when ping was sent
+}
+
+// Ping response
+message PingResponse {
+  int32 responder_id = 1;
+  int64 timestamp = 2; // Unix nano timestamp when pong was sent
+}
+
+// Request to get network graph from a peer
+message GraphRequest {
+  int32 requester_id = 1;
+}
+
+// Network graph response
+message GraphResponse {
+  repeated NetworkNode nodes = 1;
+  repeated NetworkEdge edges = 2;
+}
+
+// A node in the network graph
+message NetworkNode {
+  int32 id = 1;
+  string address = 2;
+  int64 last_seen = 3; // Unix timestamp
+}
+
+// An edge in the network graph (connection between peers)
+message NetworkEdge {
+  int32 from_id = 1;
+  int32 to_id = 2;
+  int64 latency_ms = 3; // Measured round-trip latency in milliseconds
+}
+
+// Notification about a new peer joining the network
+message NewPeerNotification {
+  int32 peer_id = 1;
+  string address = 2;
+}
+
+// Response to a new peer notification
+message NotifyResponse {
+  bool acknowledged = 1;
+}
