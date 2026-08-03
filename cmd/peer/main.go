@@ -65,6 +65,30 @@ func main() {
 	// Print the network graph
 	peerNode.PrintGraph()
 
+	// Print network metrics (Day 2)
+	fmt.Print(peerNode.Analyzer.GetNetworkMetrics(peerNode.Graph))
+
+	// Demo: calculate a route to the highest-ID peer we know about
+	nodes := peerNode.Graph.GetNodes()
+	if len(nodes) > 1 {
+		// Find a target peer (pick the one with the highest ID that isn't us)
+		var targetID int32
+		for _, n := range nodes {
+			if n.ID != peerID && n.ID > targetID {
+				targetID = n.ID
+			}
+		}
+		if targetID > 0 {
+			route, err := peerNode.CalculateRoute(targetID)
+			if err != nil {
+				fmt.Printf("Peer-%d: Route to peer-%d: %v\n", peerID, targetID, err)
+			} else {
+				fmt.Printf("Peer-%d: Route to peer-%d: path=%v latency=%dms hops=%d\n",
+					peerID, targetID, route.Path, route.TotalLatency, route.Hops)
+			}
+		}
+	}
+
 	// Wait for shutdown signal
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)

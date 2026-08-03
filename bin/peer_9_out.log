@@ -1,0 +1,23 @@
+Peer-9: gRPC server listening on :9009
+Peer-9: Registered with bootstrap. Got 0 peers
+Peer-9: No other peers found yet (first peer in the network)
+
+=== PEER-9 NETWORK GRAPH ===
+Nodes (1):
+  9: localhost
+Edges (0):
+==============================
+
+╔════════════════════════════════════╗
+║       NETWORK METRICS              ║
+╚════════════════════════════════════╝
+
+  Total Peers:        1
+  Total Connections:  0
+  Network Density:    0.00%
+  Avg Latency:        0ms
+  Min Latency:        0ms
+  Max Latency:        0ms
+  Route Cache Size:   0
+
+Peer-9: Running. Press Ctrl+C to stop.

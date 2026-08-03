@@ -163,9 +163,12 @@ var BootstrapService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	PeerService_Ping_FullMethodName            = "/p2p.PeerService/Ping"
-	PeerService_GetNetworkGraph_FullMethodName = "/p2p.PeerService/GetNetworkGraph"
-	PeerService_NotifyNewPeer_FullMethodName   = "/p2p.PeerService/NotifyNewPeer"
+	PeerService_Ping_FullMethodName                 = "/p2p.PeerService/Ping"
+	PeerService_GetNetworkGraph_FullMethodName      = "/p2p.PeerService/GetNetworkGraph"
+	PeerService_NotifyNewPeer_FullMethodName        = "/p2p.PeerService/NotifyNewPeer"
+	PeerService_CalculateRoute_FullMethodName       = "/p2p.PeerService/CalculateRoute"
+	PeerService_GetRouteCache_FullMethodName        = "/p2p.PeerService/GetRouteCache"
+	PeerService_InvalidateRouteCache_FullMethodName = "/p2p.PeerService/InvalidateRouteCache"
 )
 
 // PeerServiceClient is the client API for PeerService service.
@@ -178,6 +181,12 @@ type PeerServiceClient interface {
 	GetNetworkGraph(ctx context.Context, in *GraphRequest, opts ...grpc.CallOption) (*GraphResponse, error)
 	// Notify peer about a new peer joining the network
 	NotifyNewPeer(ctx context.Context, in *NewPeerNotification, opts ...grpc.CallOption) (*NotifyResponse, error)
+	// Calculate the shortest route between two peers using Dijkstra
+	CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
+	// Get all currently cached routes
+	GetRouteCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error)
+	// Invalidate (clear) the entire route cache
+	InvalidateRouteCache(ctx context.Context, in *InvalidateCacheRequest, opts ...grpc.CallOption) (*InvalidateCacheResponse, error)
 }
 
 type peerServiceClient struct {
@@ -218,6 +227,36 @@ func (c *peerServiceClient) NotifyNewPeer(ctx context.Context, in *NewPeerNotifi
 	return out, nil
 }
 
+func (c *peerServiceClient) CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RouteResponse)
+	err := c.cc.Invoke(ctx, PeerService_CalculateRoute_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *peerServiceClient) GetRouteCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCacheResponse)
+	err := c.cc.Invoke(ctx, PeerService_GetRouteCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *peerServiceClient) InvalidateRouteCache(ctx context.Context, in *InvalidateCacheRequest, opts ...grpc.CallOption) (*InvalidateCacheResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InvalidateCacheResponse)
+	err := c.cc.Invoke(ctx, PeerService_InvalidateRouteCache_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PeerServiceServer is the server API for PeerService service.
 // All implementations must embed UnimplementedPeerServiceServer
 // for forward compatibility.
@@ -228,6 +267,12 @@ type PeerServiceServer interface {
 	GetNetworkGraph(context.Context, *GraphRequest) (*GraphResponse, error)
 	// Notify peer about a new peer joining the network
 	NotifyNewPeer(context.Context, *NewPeerNotification) (*NotifyResponse, error)
+	// Calculate the shortest route between two peers using Dijkstra
+	CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error)
+	// Get all currently cached routes
+	GetRouteCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error)
+	// Invalidate (clear) the entire route cache
+	InvalidateRouteCache(context.Context, *InvalidateCacheRequest) (*InvalidateCacheResponse, error)
 	mustEmbedUnimplementedPeerServiceServer()
 }
 
@@ -246,6 +291,15 @@ func (UnimplementedPeerServiceServer) GetNetworkGraph(context.Context, *GraphReq
 }
 func (UnimplementedPeerServiceServer) NotifyNewPeer(context.Context, *NewPeerNotification) (*NotifyResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method NotifyNewPeer not implemented")
+}
+func (UnimplementedPeerServiceServer) CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CalculateRoute not implemented")
+}
+func (UnimplementedPeerServiceServer) GetRouteCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetRouteCache not implemented")
+}
+func (UnimplementedPeerServiceServer) InvalidateRouteCache(context.Context, *InvalidateCacheRequest) (*InvalidateCacheResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method InvalidateRouteCache not implemented")
 }
 func (UnimplementedPeerServiceServer) mustEmbedUnimplementedPeerServiceServer() {}
 func (UnimplementedPeerServiceServer) testEmbeddedByValue()                     {}
@@ -322,6 +376,60 @@ func _PeerService_NotifyNewPeer_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PeerService_CalculateRoute_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RouteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).CalculateRoute(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_CalculateRoute_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).CalculateRoute(ctx, req.(*RouteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PeerService_GetRouteCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).GetRouteCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_GetRouteCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).GetRouteCache(ctx, req.(*GetCacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PeerService_InvalidateRouteCache_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvalidateCacheRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).InvalidateRouteCache(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_InvalidateRouteCache_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).InvalidateRouteCache(ctx, req.(*InvalidateCacheRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PeerService_ServiceDesc is the grpc.ServiceDesc for PeerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -340,6 +448,18 @@ var PeerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NotifyNewPeer",
 			Handler:    _PeerService_NotifyNewPeer_Handler,
+		},
+		{
+			MethodName: "CalculateRoute",
+			Handler:    _PeerService_CalculateRoute_Handler,
+		},
+		{
+			MethodName: "GetRouteCache",
+			Handler:    _PeerService_GetRouteCache_Handler,
+		},
+		{
+			MethodName: "InvalidateRouteCache",
+			Handler:    _PeerService_InvalidateRouteCache_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

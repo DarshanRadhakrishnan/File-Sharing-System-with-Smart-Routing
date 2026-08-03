@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/darshan/p2p-fileshare/internal/routing"
 	pb "github.com/darshan/p2p-fileshare/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -92,6 +93,36 @@ func (g *NetworkGraph) GetEdges() []*NetworkEdge {
 	return edges
 }
 
+// GetNodeList returns nodes in the format expected by routing.Graph.
+func (g *NetworkGraph) GetNodeList() []routing.GraphNode {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	nodes := make([]routing.GraphNode, 0, len(g.Nodes))
+	for _, n := range g.Nodes {
+		nodes = append(nodes, routing.GraphNode{
+			ID:       n.ID,
+			Address:  n.Address,
+			LastSeen: n.LastSeen,
+		})
+	}
+	return nodes
+}
+
+// GetEdgeList returns edges in the format expected by routing.Graph.
+func (g *NetworkGraph) GetEdgeList() []routing.GraphEdge {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	edges := make([]routing.GraphEdge, 0, len(g.Edges))
+	for _, e := range g.Edges {
+		edges = append(edges, routing.GraphEdge{
+			From:      e.From,
+			To:        e.To,
+			LatencyMs: e.LatencyMs,
+		})
+	}
+	return edges
+}
+
 // ============================================================
 // PEER NODE
 // ============================================================
@@ -103,20 +134,37 @@ type PeerNode struct {
 	Address       string
 	BootstrapAddr string
 	Graph         *NetworkGraph
+	Router        *routing.DijkstraRouter
+	Analyzer      *routing.GraphAnalyzer
 	mu            sync.RWMutex
 	connections   map[int32]*grpc.ClientConn // peer_id → gRPC connection
 }
 
 // NewPeerNode creates a new peer node.
 func NewPeerNode(id int32, port int, bootstrapAddr string) *PeerNode {
+	router := routing.NewDijkstraRouter()
+	analyzer := routing.NewGraphAnalyzer(router)
+
 	return &PeerNode{
 		ID:            id,
 		Port:          port,
 		Address:       fmt.Sprintf("localhost:%d", port),
 		BootstrapAddr: bootstrapAddr,
 		Graph:         NewNetworkGraph(),
+		Router:        router,
+		Analyzer:      analyzer,
 		connections:   make(map[int32]*grpc.ClientConn),
 	}
+}
+
+// CalculateRoute finds the shortest path from this peer to the target peer.
+func (p *PeerNode) CalculateRoute(toID int32) (*routing.Route, error) {
+	return p.Router.CalculateRoute(p.Graph, p.ID, toID)
+}
+
+// GetNetworkStats returns aggregate statistics about the network.
+func (p *PeerNode) GetNetworkStats() *routing.NetworkStats {
+	return p.Analyzer.AnalyzeNetwork(p.Graph)
 }
 
 // RegisterWithBootstrap registers this peer with the bootstrap server

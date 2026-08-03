@@ -21,6 +21,393 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Request to calculate the shortest route between two peers.
+type RouteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FromPeerId    int32                  `protobuf:"varint,1,opt,name=from_peer_id,json=fromPeerId,proto3" json:"from_peer_id,omitempty"`
+	ToPeerId      int32                  `protobuf:"varint,2,opt,name=to_peer_id,json=toPeerId,proto3" json:"to_peer_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RouteRequest) Reset() {
+	*x = RouteRequest{}
+	mi := &file_p2p_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RouteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RouteRequest) ProtoMessage() {}
+
+func (x *RouteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RouteRequest.ProtoReflect.Descriptor instead.
+func (*RouteRequest) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *RouteRequest) GetFromPeerId() int32 {
+	if x != nil {
+		return x.FromPeerId
+	}
+	return 0
+}
+
+func (x *RouteRequest) GetToPeerId() int32 {
+	if x != nil {
+		return x.ToPeerId
+	}
+	return 0
+}
+
+// Response containing the calculated shortest route.
+type RouteResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Path           []int32                `protobuf:"varint,1,rep,packed,name=path,proto3" json:"path,omitempty"`                                      // Ordered sequence of peer IDs, e.g. [1, 3, 7, 10]
+	TotalLatencyMs int64                  `protobuf:"varint,2,opt,name=total_latency_ms,json=totalLatencyMs,proto3" json:"total_latency_ms,omitempty"` // Sum of edge latencies along the path
+	Hops           int32                  `protobuf:"varint,3,opt,name=hops,proto3" json:"hops,omitempty"`                                             // Number of hops (len(path) - 1)
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RouteResponse) Reset() {
+	*x = RouteResponse{}
+	mi := &file_p2p_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RouteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RouteResponse) ProtoMessage() {}
+
+func (x *RouteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RouteResponse.ProtoReflect.Descriptor instead.
+func (*RouteResponse) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RouteResponse) GetPath() []int32 {
+	if x != nil {
+		return x.Path
+	}
+	return nil
+}
+
+func (x *RouteResponse) GetTotalLatencyMs() int64 {
+	if x != nil {
+		return x.TotalLatencyMs
+	}
+	return 0
+}
+
+func (x *RouteResponse) GetHops() int32 {
+	if x != nil {
+		return x.Hops
+	}
+	return 0
+}
+
+// A single cached route entry.
+type RouteCacheEntry struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	FromPeerId     int32                  `protobuf:"varint,1,opt,name=from_peer_id,json=fromPeerId,proto3" json:"from_peer_id,omitempty"`
+	ToPeerId       int32                  `protobuf:"varint,2,opt,name=to_peer_id,json=toPeerId,proto3" json:"to_peer_id,omitempty"`
+	Path           []int32                `protobuf:"varint,3,rep,packed,name=path,proto3" json:"path,omitempty"`
+	TotalLatencyMs int64                  `protobuf:"varint,4,opt,name=total_latency_ms,json=totalLatencyMs,proto3" json:"total_latency_ms,omitempty"`
+	Hops           int32                  `protobuf:"varint,5,opt,name=hops,proto3" json:"hops,omitempty"`
+	CachedAt       int64                  `protobuf:"varint,6,opt,name=cached_at,json=cachedAt,proto3" json:"cached_at,omitempty"` // Unix timestamp
+	TtlSeconds     int32                  `protobuf:"varint,7,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RouteCacheEntry) Reset() {
+	*x = RouteCacheEntry{}
+	mi := &file_p2p_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RouteCacheEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RouteCacheEntry) ProtoMessage() {}
+
+func (x *RouteCacheEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RouteCacheEntry.ProtoReflect.Descriptor instead.
+func (*RouteCacheEntry) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RouteCacheEntry) GetFromPeerId() int32 {
+	if x != nil {
+		return x.FromPeerId
+	}
+	return 0
+}
+
+func (x *RouteCacheEntry) GetToPeerId() int32 {
+	if x != nil {
+		return x.ToPeerId
+	}
+	return 0
+}
+
+func (x *RouteCacheEntry) GetPath() []int32 {
+	if x != nil {
+		return x.Path
+	}
+	return nil
+}
+
+func (x *RouteCacheEntry) GetTotalLatencyMs() int64 {
+	if x != nil {
+		return x.TotalLatencyMs
+	}
+	return 0
+}
+
+func (x *RouteCacheEntry) GetHops() int32 {
+	if x != nil {
+		return x.Hops
+	}
+	return 0
+}
+
+func (x *RouteCacheEntry) GetCachedAt() int64 {
+	if x != nil {
+		return x.CachedAt
+	}
+	return 0
+}
+
+func (x *RouteCacheEntry) GetTtlSeconds() int32 {
+	if x != nil {
+		return x.TtlSeconds
+	}
+	return 0
+}
+
+// Request to retrieve the route cache.
+type GetCacheRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequesterId   int32                  `protobuf:"varint,1,opt,name=requester_id,json=requesterId,proto3" json:"requester_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCacheRequest) Reset() {
+	*x = GetCacheRequest{}
+	mi := &file_p2p_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCacheRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCacheRequest) ProtoMessage() {}
+
+func (x *GetCacheRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCacheRequest.ProtoReflect.Descriptor instead.
+func (*GetCacheRequest) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetCacheRequest) GetRequesterId() int32 {
+	if x != nil {
+		return x.RequesterId
+	}
+	return 0
+}
+
+// Response containing all cached route entries.
+type GetCacheResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Entries       []*RouteCacheEntry     `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCacheResponse) Reset() {
+	*x = GetCacheResponse{}
+	mi := &file_p2p_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCacheResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCacheResponse) ProtoMessage() {}
+
+func (x *GetCacheResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCacheResponse.ProtoReflect.Descriptor instead.
+func (*GetCacheResponse) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetCacheResponse) GetEntries() []*RouteCacheEntry {
+	if x != nil {
+		return x.Entries
+	}
+	return nil
+}
+
+// Request to invalidate (clear) the route cache.
+type InvalidateCacheRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvalidateCacheRequest) Reset() {
+	*x = InvalidateCacheRequest{}
+	mi := &file_p2p_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvalidateCacheRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvalidateCacheRequest) ProtoMessage() {}
+
+func (x *InvalidateCacheRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvalidateCacheRequest.ProtoReflect.Descriptor instead.
+func (*InvalidateCacheRequest) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{5}
+}
+
+// Response confirming cache invalidation.
+type InvalidateCacheResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Success        bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	EntriesCleared int32                  `protobuf:"varint,2,opt,name=entries_cleared,json=entriesCleared,proto3" json:"entries_cleared,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *InvalidateCacheResponse) Reset() {
+	*x = InvalidateCacheResponse{}
+	mi := &file_p2p_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvalidateCacheResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvalidateCacheResponse) ProtoMessage() {}
+
+func (x *InvalidateCacheResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_p2p_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvalidateCacheResponse.ProtoReflect.Descriptor instead.
+func (*InvalidateCacheResponse) Descriptor() ([]byte, []int) {
+	return file_p2p_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *InvalidateCacheResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *InvalidateCacheResponse) GetEntriesCleared() int32 {
+	if x != nil {
+		return x.EntriesCleared
+	}
+	return 0
+}
+
 // Information about a peer in the network
 type PeerInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -33,7 +420,7 @@ type PeerInfo struct {
 
 func (x *PeerInfo) Reset() {
 	*x = PeerInfo{}
-	mi := &file_p2p_proto_msgTypes[0]
+	mi := &file_p2p_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -45,7 +432,7 @@ func (x *PeerInfo) String() string {
 func (*PeerInfo) ProtoMessage() {}
 
 func (x *PeerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[0]
+	mi := &file_p2p_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +445,7 @@ func (x *PeerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PeerInfo.ProtoReflect.Descriptor instead.
 func (*PeerInfo) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{0}
+	return file_p2p_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PeerInfo) GetPeerId() int32 {
@@ -93,7 +480,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_p2p_proto_msgTypes[1]
+	mi := &file_p2p_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -105,7 +492,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[1]
+	mi := &file_p2p_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -118,7 +505,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{1}
+	return file_p2p_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RegisterRequest) GetPeerId() int32 {
@@ -146,7 +533,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_p2p_proto_msgTypes[2]
+	mi := &file_p2p_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -158,7 +545,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[2]
+	mi := &file_p2p_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -171,7 +558,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{2}
+	return file_p2p_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RegisterResponse) GetSuccess() bool {
@@ -198,7 +585,7 @@ type GetPeersRequest struct {
 
 func (x *GetPeersRequest) Reset() {
 	*x = GetPeersRequest{}
-	mi := &file_p2p_proto_msgTypes[3]
+	mi := &file_p2p_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -210,7 +597,7 @@ func (x *GetPeersRequest) String() string {
 func (*GetPeersRequest) ProtoMessage() {}
 
 func (x *GetPeersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[3]
+	mi := &file_p2p_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -223,7 +610,7 @@ func (x *GetPeersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPeersRequest.ProtoReflect.Descriptor instead.
 func (*GetPeersRequest) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{3}
+	return file_p2p_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetPeersRequest) GetLimit() int32 {
@@ -243,7 +630,7 @@ type GetPeersResponse struct {
 
 func (x *GetPeersResponse) Reset() {
 	*x = GetPeersResponse{}
-	mi := &file_p2p_proto_msgTypes[4]
+	mi := &file_p2p_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -255,7 +642,7 @@ func (x *GetPeersResponse) String() string {
 func (*GetPeersResponse) ProtoMessage() {}
 
 func (x *GetPeersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[4]
+	mi := &file_p2p_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +655,7 @@ func (x *GetPeersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPeersResponse.ProtoReflect.Descriptor instead.
 func (*GetPeersResponse) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{4}
+	return file_p2p_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetPeersResponse) GetPeers() []*PeerInfo {
@@ -289,7 +676,7 @@ type PingRequest struct {
 
 func (x *PingRequest) Reset() {
 	*x = PingRequest{}
-	mi := &file_p2p_proto_msgTypes[5]
+	mi := &file_p2p_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -301,7 +688,7 @@ func (x *PingRequest) String() string {
 func (*PingRequest) ProtoMessage() {}
 
 func (x *PingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[5]
+	mi := &file_p2p_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -314,7 +701,7 @@ func (x *PingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
 func (*PingRequest) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{5}
+	return file_p2p_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *PingRequest) GetSenderId() int32 {
@@ -342,7 +729,7 @@ type PingResponse struct {
 
 func (x *PingResponse) Reset() {
 	*x = PingResponse{}
-	mi := &file_p2p_proto_msgTypes[6]
+	mi := &file_p2p_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -354,7 +741,7 @@ func (x *PingResponse) String() string {
 func (*PingResponse) ProtoMessage() {}
 
 func (x *PingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[6]
+	mi := &file_p2p_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -367,7 +754,7 @@ func (x *PingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
 func (*PingResponse) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{6}
+	return file_p2p_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *PingResponse) GetResponderId() int32 {
@@ -394,7 +781,7 @@ type GraphRequest struct {
 
 func (x *GraphRequest) Reset() {
 	*x = GraphRequest{}
-	mi := &file_p2p_proto_msgTypes[7]
+	mi := &file_p2p_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -406,7 +793,7 @@ func (x *GraphRequest) String() string {
 func (*GraphRequest) ProtoMessage() {}
 
 func (x *GraphRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[7]
+	mi := &file_p2p_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -419,7 +806,7 @@ func (x *GraphRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GraphRequest.ProtoReflect.Descriptor instead.
 func (*GraphRequest) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{7}
+	return file_p2p_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GraphRequest) GetRequesterId() int32 {
@@ -440,7 +827,7 @@ type GraphResponse struct {
 
 func (x *GraphResponse) Reset() {
 	*x = GraphResponse{}
-	mi := &file_p2p_proto_msgTypes[8]
+	mi := &file_p2p_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -452,7 +839,7 @@ func (x *GraphResponse) String() string {
 func (*GraphResponse) ProtoMessage() {}
 
 func (x *GraphResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[8]
+	mi := &file_p2p_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -465,7 +852,7 @@ func (x *GraphResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GraphResponse.ProtoReflect.Descriptor instead.
 func (*GraphResponse) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{8}
+	return file_p2p_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GraphResponse) GetNodes() []*NetworkNode {
@@ -494,7 +881,7 @@ type NetworkNode struct {
 
 func (x *NetworkNode) Reset() {
 	*x = NetworkNode{}
-	mi := &file_p2p_proto_msgTypes[9]
+	mi := &file_p2p_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -506,7 +893,7 @@ func (x *NetworkNode) String() string {
 func (*NetworkNode) ProtoMessage() {}
 
 func (x *NetworkNode) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[9]
+	mi := &file_p2p_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -519,7 +906,7 @@ func (x *NetworkNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkNode.ProtoReflect.Descriptor instead.
 func (*NetworkNode) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{9}
+	return file_p2p_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *NetworkNode) GetId() int32 {
@@ -555,7 +942,7 @@ type NetworkEdge struct {
 
 func (x *NetworkEdge) Reset() {
 	*x = NetworkEdge{}
-	mi := &file_p2p_proto_msgTypes[10]
+	mi := &file_p2p_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -567,7 +954,7 @@ func (x *NetworkEdge) String() string {
 func (*NetworkEdge) ProtoMessage() {}
 
 func (x *NetworkEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[10]
+	mi := &file_p2p_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -580,7 +967,7 @@ func (x *NetworkEdge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkEdge.ProtoReflect.Descriptor instead.
 func (*NetworkEdge) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{10}
+	return file_p2p_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *NetworkEdge) GetFromId() int32 {
@@ -615,7 +1002,7 @@ type NewPeerNotification struct {
 
 func (x *NewPeerNotification) Reset() {
 	*x = NewPeerNotification{}
-	mi := &file_p2p_proto_msgTypes[11]
+	mi := &file_p2p_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -627,7 +1014,7 @@ func (x *NewPeerNotification) String() string {
 func (*NewPeerNotification) ProtoMessage() {}
 
 func (x *NewPeerNotification) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[11]
+	mi := &file_p2p_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -640,7 +1027,7 @@ func (x *NewPeerNotification) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NewPeerNotification.ProtoReflect.Descriptor instead.
 func (*NewPeerNotification) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{11}
+	return file_p2p_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *NewPeerNotification) GetPeerId() int32 {
@@ -667,7 +1054,7 @@ type NotifyResponse struct {
 
 func (x *NotifyResponse) Reset() {
 	*x = NotifyResponse{}
-	mi := &file_p2p_proto_msgTypes[12]
+	mi := &file_p2p_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -679,7 +1066,7 @@ func (x *NotifyResponse) String() string {
 func (*NotifyResponse) ProtoMessage() {}
 
 func (x *NotifyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_p2p_proto_msgTypes[12]
+	mi := &file_p2p_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -692,7 +1079,7 @@ func (x *NotifyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotifyResponse.ProtoReflect.Descriptor instead.
 func (*NotifyResponse) Descriptor() ([]byte, []int) {
-	return file_p2p_proto_rawDescGZIP(), []int{12}
+	return file_p2p_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *NotifyResponse) GetAcknowledged() bool {
@@ -706,7 +1093,35 @@ var File_p2p_proto protoreflect.FileDescriptor
 
 const file_p2p_proto_rawDesc = "" +
 	"\n" +
-	"\tp2p.proto\x12\x03p2p\"Z\n" +
+	"\tp2p.proto\x12\x03p2p\"N\n" +
+	"\fRouteRequest\x12 \n" +
+	"\ffrom_peer_id\x18\x01 \x01(\x05R\n" +
+	"fromPeerId\x12\x1c\n" +
+	"\n" +
+	"to_peer_id\x18\x02 \x01(\x05R\btoPeerId\"a\n" +
+	"\rRouteResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x03(\x05R\x04path\x12(\n" +
+	"\x10total_latency_ms\x18\x02 \x01(\x03R\x0etotalLatencyMs\x12\x12\n" +
+	"\x04hops\x18\x03 \x01(\x05R\x04hops\"\xe1\x01\n" +
+	"\x0fRouteCacheEntry\x12 \n" +
+	"\ffrom_peer_id\x18\x01 \x01(\x05R\n" +
+	"fromPeerId\x12\x1c\n" +
+	"\n" +
+	"to_peer_id\x18\x02 \x01(\x05R\btoPeerId\x12\x12\n" +
+	"\x04path\x18\x03 \x03(\x05R\x04path\x12(\n" +
+	"\x10total_latency_ms\x18\x04 \x01(\x03R\x0etotalLatencyMs\x12\x12\n" +
+	"\x04hops\x18\x05 \x01(\x05R\x04hops\x12\x1b\n" +
+	"\tcached_at\x18\x06 \x01(\x03R\bcachedAt\x12\x1f\n" +
+	"\vttl_seconds\x18\a \x01(\x05R\n" +
+	"ttlSeconds\"4\n" +
+	"\x0fGetCacheRequest\x12!\n" +
+	"\frequester_id\x18\x01 \x01(\x05R\vrequesterId\"B\n" +
+	"\x10GetCacheResponse\x12.\n" +
+	"\aentries\x18\x01 \x03(\v2\x14.p2p.RouteCacheEntryR\aentries\"\x18\n" +
+	"\x16InvalidateCacheRequest\"\\\n" +
+	"\x17InvalidateCacheResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12'\n" +
+	"\x0fentries_cleared\x18\x02 \x01(\x05R\x0eentriesCleared\"Z\n" +
 	"\bPeerInfo\x12\x17\n" +
 	"\apeer_id\x18\x01 \x01(\x05R\x06peerId\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1b\n" +
@@ -748,11 +1163,14 @@ const file_p2p_proto_rawDesc = "" +
 	"\facknowledged\x18\x01 \x01(\bR\facknowledged2\x88\x01\n" +
 	"\x10BootstrapService\x12;\n" +
 	"\fRegisterPeer\x12\x14.p2p.RegisterRequest\x1a\x15.p2p.RegisterResponse\x127\n" +
-	"\bGetPeers\x12\x14.p2p.GetPeersRequest\x1a\x15.p2p.GetPeersResponse2\xb4\x01\n" +
+	"\bGetPeers\x12\x14.p2p.GetPeersRequest\x1a\x15.p2p.GetPeersResponse2\xfe\x02\n" +
 	"\vPeerService\x12+\n" +
 	"\x04Ping\x12\x10.p2p.PingRequest\x1a\x11.p2p.PingResponse\x128\n" +
 	"\x0fGetNetworkGraph\x12\x11.p2p.GraphRequest\x1a\x12.p2p.GraphResponse\x12>\n" +
-	"\rNotifyNewPeer\x12\x18.p2p.NewPeerNotification\x1a\x13.p2p.NotifyResponseB(Z&github.com/darshan/p2p-fileshare/protob\x06proto3"
+	"\rNotifyNewPeer\x12\x18.p2p.NewPeerNotification\x1a\x13.p2p.NotifyResponse\x127\n" +
+	"\x0eCalculateRoute\x12\x11.p2p.RouteRequest\x1a\x12.p2p.RouteResponse\x12<\n" +
+	"\rGetRouteCache\x12\x14.p2p.GetCacheRequest\x1a\x15.p2p.GetCacheResponse\x12Q\n" +
+	"\x14InvalidateRouteCache\x12\x1b.p2p.InvalidateCacheRequest\x1a\x1c.p2p.InvalidateCacheResponseB(Z&github.com/darshan/p2p-fileshare/protob\x06proto3"
 
 var (
 	file_p2p_proto_rawDescOnce sync.Once
@@ -766,42 +1184,56 @@ func file_p2p_proto_rawDescGZIP() []byte {
 	return file_p2p_proto_rawDescData
 }
 
-var file_p2p_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_p2p_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_p2p_proto_goTypes = []any{
-	(*PeerInfo)(nil),            // 0: p2p.PeerInfo
-	(*RegisterRequest)(nil),     // 1: p2p.RegisterRequest
-	(*RegisterResponse)(nil),    // 2: p2p.RegisterResponse
-	(*GetPeersRequest)(nil),     // 3: p2p.GetPeersRequest
-	(*GetPeersResponse)(nil),    // 4: p2p.GetPeersResponse
-	(*PingRequest)(nil),         // 5: p2p.PingRequest
-	(*PingResponse)(nil),        // 6: p2p.PingResponse
-	(*GraphRequest)(nil),        // 7: p2p.GraphRequest
-	(*GraphResponse)(nil),       // 8: p2p.GraphResponse
-	(*NetworkNode)(nil),         // 9: p2p.NetworkNode
-	(*NetworkEdge)(nil),         // 10: p2p.NetworkEdge
-	(*NewPeerNotification)(nil), // 11: p2p.NewPeerNotification
-	(*NotifyResponse)(nil),      // 12: p2p.NotifyResponse
+	(*RouteRequest)(nil),            // 0: p2p.RouteRequest
+	(*RouteResponse)(nil),           // 1: p2p.RouteResponse
+	(*RouteCacheEntry)(nil),         // 2: p2p.RouteCacheEntry
+	(*GetCacheRequest)(nil),         // 3: p2p.GetCacheRequest
+	(*GetCacheResponse)(nil),        // 4: p2p.GetCacheResponse
+	(*InvalidateCacheRequest)(nil),  // 5: p2p.InvalidateCacheRequest
+	(*InvalidateCacheResponse)(nil), // 6: p2p.InvalidateCacheResponse
+	(*PeerInfo)(nil),                // 7: p2p.PeerInfo
+	(*RegisterRequest)(nil),         // 8: p2p.RegisterRequest
+	(*RegisterResponse)(nil),        // 9: p2p.RegisterResponse
+	(*GetPeersRequest)(nil),         // 10: p2p.GetPeersRequest
+	(*GetPeersResponse)(nil),        // 11: p2p.GetPeersResponse
+	(*PingRequest)(nil),             // 12: p2p.PingRequest
+	(*PingResponse)(nil),            // 13: p2p.PingResponse
+	(*GraphRequest)(nil),            // 14: p2p.GraphRequest
+	(*GraphResponse)(nil),           // 15: p2p.GraphResponse
+	(*NetworkNode)(nil),             // 16: p2p.NetworkNode
+	(*NetworkEdge)(nil),             // 17: p2p.NetworkEdge
+	(*NewPeerNotification)(nil),     // 18: p2p.NewPeerNotification
+	(*NotifyResponse)(nil),          // 19: p2p.NotifyResponse
 }
 var file_p2p_proto_depIdxs = []int32{
-	0,  // 0: p2p.RegisterResponse.peers:type_name -> p2p.PeerInfo
-	0,  // 1: p2p.GetPeersResponse.peers:type_name -> p2p.PeerInfo
-	9,  // 2: p2p.GraphResponse.nodes:type_name -> p2p.NetworkNode
-	10, // 3: p2p.GraphResponse.edges:type_name -> p2p.NetworkEdge
-	1,  // 4: p2p.BootstrapService.RegisterPeer:input_type -> p2p.RegisterRequest
-	3,  // 5: p2p.BootstrapService.GetPeers:input_type -> p2p.GetPeersRequest
-	5,  // 6: p2p.PeerService.Ping:input_type -> p2p.PingRequest
-	7,  // 7: p2p.PeerService.GetNetworkGraph:input_type -> p2p.GraphRequest
-	11, // 8: p2p.PeerService.NotifyNewPeer:input_type -> p2p.NewPeerNotification
-	2,  // 9: p2p.BootstrapService.RegisterPeer:output_type -> p2p.RegisterResponse
-	4,  // 10: p2p.BootstrapService.GetPeers:output_type -> p2p.GetPeersResponse
-	6,  // 11: p2p.PeerService.Ping:output_type -> p2p.PingResponse
-	8,  // 12: p2p.PeerService.GetNetworkGraph:output_type -> p2p.GraphResponse
-	12, // 13: p2p.PeerService.NotifyNewPeer:output_type -> p2p.NotifyResponse
-	9,  // [9:14] is the sub-list for method output_type
-	4,  // [4:9] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	2,  // 0: p2p.GetCacheResponse.entries:type_name -> p2p.RouteCacheEntry
+	7,  // 1: p2p.RegisterResponse.peers:type_name -> p2p.PeerInfo
+	7,  // 2: p2p.GetPeersResponse.peers:type_name -> p2p.PeerInfo
+	16, // 3: p2p.GraphResponse.nodes:type_name -> p2p.NetworkNode
+	17, // 4: p2p.GraphResponse.edges:type_name -> p2p.NetworkEdge
+	8,  // 5: p2p.BootstrapService.RegisterPeer:input_type -> p2p.RegisterRequest
+	10, // 6: p2p.BootstrapService.GetPeers:input_type -> p2p.GetPeersRequest
+	12, // 7: p2p.PeerService.Ping:input_type -> p2p.PingRequest
+	14, // 8: p2p.PeerService.GetNetworkGraph:input_type -> p2p.GraphRequest
+	18, // 9: p2p.PeerService.NotifyNewPeer:input_type -> p2p.NewPeerNotification
+	0,  // 10: p2p.PeerService.CalculateRoute:input_type -> p2p.RouteRequest
+	3,  // 11: p2p.PeerService.GetRouteCache:input_type -> p2p.GetCacheRequest
+	5,  // 12: p2p.PeerService.InvalidateRouteCache:input_type -> p2p.InvalidateCacheRequest
+	9,  // 13: p2p.BootstrapService.RegisterPeer:output_type -> p2p.RegisterResponse
+	11, // 14: p2p.BootstrapService.GetPeers:output_type -> p2p.GetPeersResponse
+	13, // 15: p2p.PeerService.Ping:output_type -> p2p.PingResponse
+	15, // 16: p2p.PeerService.GetNetworkGraph:output_type -> p2p.GraphResponse
+	19, // 17: p2p.PeerService.NotifyNewPeer:output_type -> p2p.NotifyResponse
+	1,  // 18: p2p.PeerService.CalculateRoute:output_type -> p2p.RouteResponse
+	4,  // 19: p2p.PeerService.GetRouteCache:output_type -> p2p.GetCacheResponse
+	6,  // 20: p2p.PeerService.InvalidateRouteCache:output_type -> p2p.InvalidateCacheResponse
+	13, // [13:21] is the sub-list for method output_type
+	5,  // [5:13] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_p2p_proto_init() }
@@ -815,7 +1247,7 @@ func file_p2p_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_p2p_proto_rawDesc), len(file_p2p_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

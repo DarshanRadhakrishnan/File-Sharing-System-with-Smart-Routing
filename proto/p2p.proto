@@ -28,6 +28,59 @@ service PeerService {
   rpc GetNetworkGraph(GraphRequest) returns (GraphResponse);
   // Notify peer about a new peer joining the network
   rpc NotifyNewPeer(NewPeerNotification) returns (NotifyResponse);
+  // Calculate the shortest route between two peers using Dijkstra
+  rpc CalculateRoute(RouteRequest) returns (RouteResponse);
+  // Get all currently cached routes
+  rpc GetRouteCache(GetCacheRequest) returns (GetCacheResponse);
+  // Invalidate (clear) the entire route cache
+  rpc InvalidateRouteCache(InvalidateCacheRequest) returns (InvalidateCacheResponse);
+}
+
+// ============================================================
+// ROUTING MESSAGES (Day 2)
+// ============================================================
+
+// Request to calculate the shortest route between two peers.
+message RouteRequest {
+  int32 from_peer_id = 1;
+  int32 to_peer_id = 2;
+}
+
+// Response containing the calculated shortest route.
+message RouteResponse {
+  repeated int32 path = 1;       // Ordered sequence of peer IDs, e.g. [1, 3, 7, 10]
+  int64 total_latency_ms = 2;    // Sum of edge latencies along the path
+  int32 hops = 3;                // Number of hops (len(path) - 1)
+}
+
+// A single cached route entry.
+message RouteCacheEntry {
+  int32 from_peer_id = 1;
+  int32 to_peer_id = 2;
+  repeated int32 path = 3;
+  int64 total_latency_ms = 4;
+  int32 hops = 5;
+  int64 cached_at = 6;          // Unix timestamp
+  int32 ttl_seconds = 7;
+}
+
+// Request to retrieve the route cache.
+message GetCacheRequest {
+  int32 requester_id = 1;
+}
+
+// Response containing all cached route entries.
+message GetCacheResponse {
+  repeated RouteCacheEntry entries = 1;
+}
+
+// Request to invalidate (clear) the route cache.
+message InvalidateCacheRequest {}
+
+// Response confirming cache invalidation.
+message InvalidateCacheResponse {
+  bool success = 1;
+  int32 entries_cleared = 2;
 }
 
 // ============================================================

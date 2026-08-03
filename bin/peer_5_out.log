@@ -1,0 +1,32 @@
+Peer-5: gRPC server listening on :9005
+Peer-5: Registered with bootstrap. Got 3 peers
+Peer-5: Connected to peer-7 (latency: 13ms)
+Peer-5: Connected to peer-3 (latency: 17ms)
+Peer-5: Connected to peer-6 (latency: 17ms)
+
+=== PEER-5 NETWORK GRAPH ===
+Nodes (4):
+  3: localhost:9003
+  5: localhost
+  6: localhost:9006
+  7: localhost:9007
+Edges (3):
+  5 → 3 (latency: 17ms)
+  5 → 6 (latency: 17ms)
+  5 → 7 (latency: 13ms)
+==============================
+
+╔════════════════════════════════════╗
+║       NETWORK METRICS              ║
+╚════════════════════════════════════╝
+
+  Total Peers:        4
+  Total Connections:  3
+  Network Density:    25.00%
+  Avg Latency:        15ms
+  Min Latency:        13ms
+  Max Latency:        17ms
+  Route Cache Size:   0
+Peer-5: Route to peer-7: path=[5 7] latency=13ms hops=1
+
+Peer-5: Running. Press Ctrl+C to stop.

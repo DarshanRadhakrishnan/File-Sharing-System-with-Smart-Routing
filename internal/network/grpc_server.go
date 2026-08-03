@@ -50,3 +50,58 @@ func (s *PeerGRPCServer) NotifyNewPeer(ctx context.Context, req *pb.NewPeerNotif
 		Acknowledged: true,
 	}, nil
 }
+
+// ============================================================
+// ROUTING RPCs (Day 2)
+// ============================================================
+
+// CalculateRoute finds the shortest path between two peers using Dijkstra's algorithm.
+func (s *PeerGRPCServer) CalculateRoute(ctx context.Context, req *pb.RouteRequest) (*pb.RouteResponse, error) {
+	route, err := s.PeerNode.Router.CalculateRoute(s.PeerNode.Graph, req.FromPeerId, req.ToPeerId)
+	if err != nil {
+		fmt.Printf("Peer-%d: Route calculation failed (%d → %d): %v\n",
+			s.PeerNode.ID, req.FromPeerId, req.ToPeerId, err)
+		return nil, err
+	}
+
+	return &pb.RouteResponse{
+		Path:           route.Path,
+		TotalLatencyMs: route.TotalLatency,
+		Hops:           route.Hops,
+	}, nil
+}
+
+// GetRouteCache returns all currently cached routes.
+func (s *PeerGRPCServer) GetRouteCache(ctx context.Context, req *pb.GetCacheRequest) (*pb.GetCacheResponse, error) {
+	cache := s.PeerNode.Router.GetCache()
+	routes := cache.Entries()
+	ttlSeconds := int32(cache.TTL().Seconds())
+
+	entries := make([]*pb.RouteCacheEntry, 0, len(routes))
+	for _, r := range routes {
+		entries = append(entries, &pb.RouteCacheEntry{
+			FromPeerId:     r.FromPeerID,
+			ToPeerId:       r.ToPeerID,
+			Path:           r.Path,
+			TotalLatencyMs: r.TotalLatency,
+			Hops:           r.Hops,
+			CachedAt:       r.CreatedAt.Unix(),
+			TtlSeconds:     ttlSeconds,
+		})
+	}
+
+	return &pb.GetCacheResponse{
+		Entries: entries,
+	}, nil
+}
+
+// InvalidateRouteCache clears all cached routes.
+func (s *PeerGRPCServer) InvalidateRouteCache(ctx context.Context, req *pb.InvalidateCacheRequest) (*pb.InvalidateCacheResponse, error) {
+	cleared := s.PeerNode.Router.InvalidateCache()
+	fmt.Printf("Peer-%d: Route cache invalidated (%d entries cleared)\n", s.PeerNode.ID, cleared)
+
+	return &pb.InvalidateCacheResponse{
+		Success:        true,
+		EntriesCleared: int32(cleared),
+	}, nil
+}
