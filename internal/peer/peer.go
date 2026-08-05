@@ -3,6 +3,7 @@ package peer
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"sort"
 	"strings"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/darshan/p2p-fileshare/internal/routing"
+	"github.com/darshan/p2p-fileshare/internal/storage"
 	pb "github.com/darshan/p2p-fileshare/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -136,6 +138,7 @@ type PeerNode struct {
 	Graph         *NetworkGraph
 	Router        *routing.DijkstraRouter
 	Analyzer      *routing.GraphAnalyzer
+	Storage       *storage.StorageManager // Day 3: chunk/bloom storage
 	mu            sync.RWMutex
 	connections   map[int32]*grpc.ClientConn // peer_id → gRPC connection
 }
@@ -145,6 +148,13 @@ func NewPeerNode(id int32, port int, bootstrapAddr string) *PeerNode {
 	router := routing.NewDijkstraRouter()
 	analyzer := routing.NewGraphAnalyzer(router)
 
+	// Day 3: Initialize chunk/bloom storage
+	storageDir := fmt.Sprintf("./data/peer-%d", id)
+	storageMgr, err := storage.NewStorageManager(id, storageDir)
+	if err != nil {
+		log.Fatalf("Peer-%d: failed to init storage: %v\n", id, err)
+	}
+
 	return &PeerNode{
 		ID:            id,
 		Port:          port,
@@ -153,6 +163,7 @@ func NewPeerNode(id int32, port int, bootstrapAddr string) *PeerNode {
 		Graph:         NewNetworkGraph(),
 		Router:        router,
 		Analyzer:      analyzer,
+		Storage:       storageMgr,
 		connections:   make(map[int32]*grpc.ClientConn),
 	}
 }

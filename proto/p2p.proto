@@ -34,6 +34,12 @@ service PeerService {
   rpc GetRouteCache(GetCacheRequest) returns (GetCacheResponse);
   // Invalidate (clear) the entire route cache
   rpc InvalidateRouteCache(InvalidateCacheRequest) returns (InvalidateCacheResponse);
+
+  // Day 3: Chunk and Bloom Filter RPCs
+  rpc HasChunk(HasChunkRequest) returns (HasChunkResponse);
+  rpc GetBloomFilter(GetBloomFilterRequest) returns (GetBloomFilterResponse);
+  rpc DownloadChunk(DownloadChunkRequest) returns (DownloadChunkResponse);
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
 }
 
 // ============================================================
@@ -171,3 +177,57 @@ message NewPeerNotification {
 message NotifyResponse {
   bool acknowledged = 1;
 }
+
+// ============================================================
+// CHUNK & BLOOM FILTER MESSAGES (Day 3)
+// ============================================================
+
+message ChunkInfo {
+  string file_id = 1;
+  int32 chunk_index = 2;
+  int32 chunk_size = 3;
+  string sha256_hash = 4;
+}
+
+message HasChunkRequest {
+  string file_id = 1;
+  int32 chunk_index = 2;
+}
+
+message HasChunkResponse {
+  bool might_have = 1;   // Bloom filter result (may false positive)
+  bool confirmed = 2;    // Actual confirmation after real check
+}
+
+message GetBloomFilterRequest {}
+
+message GetBloomFilterResponse {
+  bytes bit_array = 1;
+  int32 num_bits = 2;
+  int32 num_hash_functions = 3;
+  int32 items_added = 4;
+}
+
+message DownloadChunkRequest {
+  string file_id = 1;
+  int32 chunk_index = 2;
+}
+
+message DownloadChunkResponse {
+  bytes data = 1;
+  string sha256_hash = 2;
+  bool success = 3;
+  string error_message = 4;
+}
+
+message UploadFileRequest {
+  string file_name = 1;
+  bytes file_data = 2;
+}
+
+message UploadFileResponse {
+  string file_id = 1;
+  int32 total_chunks = 2;
+  repeated ChunkInfo chunks = 3;
+}
+

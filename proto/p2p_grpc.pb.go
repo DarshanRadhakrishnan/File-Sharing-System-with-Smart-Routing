@@ -169,6 +169,10 @@ const (
 	PeerService_CalculateRoute_FullMethodName       = "/p2p.PeerService/CalculateRoute"
 	PeerService_GetRouteCache_FullMethodName        = "/p2p.PeerService/GetRouteCache"
 	PeerService_InvalidateRouteCache_FullMethodName = "/p2p.PeerService/InvalidateRouteCache"
+	PeerService_HasChunk_FullMethodName             = "/p2p.PeerService/HasChunk"
+	PeerService_GetBloomFilter_FullMethodName       = "/p2p.PeerService/GetBloomFilter"
+	PeerService_DownloadChunk_FullMethodName        = "/p2p.PeerService/DownloadChunk"
+	PeerService_UploadFile_FullMethodName           = "/p2p.PeerService/UploadFile"
 )
 
 // PeerServiceClient is the client API for PeerService service.
@@ -187,6 +191,11 @@ type PeerServiceClient interface {
 	GetRouteCache(ctx context.Context, in *GetCacheRequest, opts ...grpc.CallOption) (*GetCacheResponse, error)
 	// Invalidate (clear) the entire route cache
 	InvalidateRouteCache(ctx context.Context, in *InvalidateCacheRequest, opts ...grpc.CallOption) (*InvalidateCacheResponse, error)
+	// Day 3: Chunk and Bloom Filter RPCs
+	HasChunk(ctx context.Context, in *HasChunkRequest, opts ...grpc.CallOption) (*HasChunkResponse, error)
+	GetBloomFilter(ctx context.Context, in *GetBloomFilterRequest, opts ...grpc.CallOption) (*GetBloomFilterResponse, error)
+	DownloadChunk(ctx context.Context, in *DownloadChunkRequest, opts ...grpc.CallOption) (*DownloadChunkResponse, error)
+	UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
 }
 
 type peerServiceClient struct {
@@ -257,6 +266,46 @@ func (c *peerServiceClient) InvalidateRouteCache(ctx context.Context, in *Invali
 	return out, nil
 }
 
+func (c *peerServiceClient) HasChunk(ctx context.Context, in *HasChunkRequest, opts ...grpc.CallOption) (*HasChunkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HasChunkResponse)
+	err := c.cc.Invoke(ctx, PeerService_HasChunk_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *peerServiceClient) GetBloomFilter(ctx context.Context, in *GetBloomFilterRequest, opts ...grpc.CallOption) (*GetBloomFilterResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBloomFilterResponse)
+	err := c.cc.Invoke(ctx, PeerService_GetBloomFilter_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *peerServiceClient) DownloadChunk(ctx context.Context, in *DownloadChunkRequest, opts ...grpc.CallOption) (*DownloadChunkResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DownloadChunkResponse)
+	err := c.cc.Invoke(ctx, PeerService_DownloadChunk_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *peerServiceClient) UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UploadFileResponse)
+	err := c.cc.Invoke(ctx, PeerService_UploadFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PeerServiceServer is the server API for PeerService service.
 // All implementations must embed UnimplementedPeerServiceServer
 // for forward compatibility.
@@ -273,6 +322,11 @@ type PeerServiceServer interface {
 	GetRouteCache(context.Context, *GetCacheRequest) (*GetCacheResponse, error)
 	// Invalidate (clear) the entire route cache
 	InvalidateRouteCache(context.Context, *InvalidateCacheRequest) (*InvalidateCacheResponse, error)
+	// Day 3: Chunk and Bloom Filter RPCs
+	HasChunk(context.Context, *HasChunkRequest) (*HasChunkResponse, error)
+	GetBloomFilter(context.Context, *GetBloomFilterRequest) (*GetBloomFilterResponse, error)
+	DownloadChunk(context.Context, *DownloadChunkRequest) (*DownloadChunkResponse, error)
+	UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error)
 	mustEmbedUnimplementedPeerServiceServer()
 }
 
@@ -300,6 +354,18 @@ func (UnimplementedPeerServiceServer) GetRouteCache(context.Context, *GetCacheRe
 }
 func (UnimplementedPeerServiceServer) InvalidateRouteCache(context.Context, *InvalidateCacheRequest) (*InvalidateCacheResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InvalidateRouteCache not implemented")
+}
+func (UnimplementedPeerServiceServer) HasChunk(context.Context, *HasChunkRequest) (*HasChunkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method HasChunk not implemented")
+}
+func (UnimplementedPeerServiceServer) GetBloomFilter(context.Context, *GetBloomFilterRequest) (*GetBloomFilterResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBloomFilter not implemented")
+}
+func (UnimplementedPeerServiceServer) DownloadChunk(context.Context, *DownloadChunkRequest) (*DownloadChunkResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DownloadChunk not implemented")
+}
+func (UnimplementedPeerServiceServer) UploadFile(context.Context, *UploadFileRequest) (*UploadFileResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadFile not implemented")
 }
 func (UnimplementedPeerServiceServer) mustEmbedUnimplementedPeerServiceServer() {}
 func (UnimplementedPeerServiceServer) testEmbeddedByValue()                     {}
@@ -430,6 +496,78 @@ func _PeerService_InvalidateRouteCache_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PeerService_HasChunk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HasChunkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).HasChunk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_HasChunk_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).HasChunk(ctx, req.(*HasChunkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PeerService_GetBloomFilter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBloomFilterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).GetBloomFilter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_GetBloomFilter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).GetBloomFilter(ctx, req.(*GetBloomFilterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PeerService_DownloadChunk_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadChunkRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).DownloadChunk(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_DownloadChunk_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).DownloadChunk(ctx, req.(*DownloadChunkRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PeerService_UploadFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PeerServiceServer).UploadFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PeerService_UploadFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PeerServiceServer).UploadFile(ctx, req.(*UploadFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PeerService_ServiceDesc is the grpc.ServiceDesc for PeerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -460,6 +598,22 @@ var PeerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InvalidateRouteCache",
 			Handler:    _PeerService_InvalidateRouteCache_Handler,
+		},
+		{
+			MethodName: "HasChunk",
+			Handler:    _PeerService_HasChunk_Handler,
+		},
+		{
+			MethodName: "GetBloomFilter",
+			Handler:    _PeerService_GetBloomFilter_Handler,
+		},
+		{
+			MethodName: "DownloadChunk",
+			Handler:    _PeerService_DownloadChunk_Handler,
+		},
+		{
+			MethodName: "UploadFile",
+			Handler:    _PeerService_UploadFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

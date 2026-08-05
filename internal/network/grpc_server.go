@@ -105,3 +105,75 @@ func (s *PeerGRPCServer) InvalidateRouteCache(ctx context.Context, req *pb.Inval
 		EntriesCleared: int32(cleared),
 	}, nil
 }
+
+// ============================================================
+// CHUNK & BLOOM FILTER RPCs (Day 3)
+// ============================================================
+
+// HasChunk checks if this peer has a specific chunk using the bloom filter
+// for a fast probabilistic check, then confirms with ground truth.
+func (s *PeerGRPCServer) HasChunk(ctx context.Context, req *pb.HasChunkRequest) (*pb.HasChunkResponse, error) {
+	mightHave := s.PeerNode.Storage.MightHaveChunk(req.FileId, req.ChunkIndex)
+
+	confirmed := false
+	if mightHave {
+		confirmed = s.PeerNode.Storage.ConfirmHasChunk(req.FileId, req.ChunkIndex)
+	}
+
+	return &pb.HasChunkResponse{
+		MightHave: mightHave,
+		Confirmed: confirmed,
+	}, nil
+}
+
+// GetBloomFilter returns this peer's serialized bloom filter for remote inspection.
+func (s *PeerGRPCServer) GetBloomFilter(ctx context.Context, req *pb.GetBloomFilterRequest) (*pb.GetBloomFilterResponse, error) {
+	bitArray, numBits, numHashes, itemCount := s.PeerNode.Storage.Bloom.Serialize()
+
+	return &pb.GetBloomFilterResponse{
+		BitArray:         bitArray,
+		NumBits:          numBits,
+		NumHashFunctions: numHashes,
+		ItemsAdded:       itemCount,
+	}, nil
+}
+
+// DownloadChunk returns the raw chunk data and its SHA-256 hash.
+func (s *PeerGRPCServer) DownloadChunk(ctx context.Context, req *pb.DownloadChunkRequest) (*pb.DownloadChunkResponse, error) {
+	data, hash, err := s.PeerNode.Storage.DownloadChunk(req.FileId, req.ChunkIndex)
+	if err != nil {
+		return &pb.DownloadChunkResponse{
+			Success:      false,
+			ErrorMessage: err.Error(),
+		}, nil
+	}
+
+	return &pb.DownloadChunkResponse{
+		Data:       data,
+		Sha256Hash: hash,
+		Success:    true,
+	}, nil
+}
+
+// UploadFile splits a file into chunks, hashes each, and stores them.
+func (s *PeerGRPCServer) UploadFile(ctx context.Context, req *pb.UploadFileRequest) (*pb.UploadFileResponse, error) {
+	metadata, err := s.PeerNode.Storage.UploadFile(req.FileName, req.FileData)
+	if err != nil {
+		return nil, err
+	}
+
+	var chunkInfos []*pb.ChunkInfo
+	for i, hash := range metadata.ChunkHashes {
+		chunkInfos = append(chunkInfos, &pb.ChunkInfo{
+			FileId:     metadata.FileID,
+			ChunkIndex: int32(i),
+			Sha256Hash: hash,
+		})
+	}
+
+	return &pb.UploadFileResponse{
+		FileId:      metadata.FileID,
+		TotalChunks: metadata.TotalChunks,
+		Chunks:      chunkInfos,
+	}, nil
+}
